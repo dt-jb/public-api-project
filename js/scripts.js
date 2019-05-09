@@ -37,7 +37,6 @@ function modalEvents(data) {
   cards.forEach( (card, i) => {
     card.addEventListener('click', (event) => {
       modalHTML(data, i);
-      //console.log(i);
     });
   });
 }
@@ -60,10 +59,32 @@ function modalHTML(data, i) {
                 <p class="modal-text">${employeeGallery[i].dob.date}</p>
             </div>
         </div>
+        <div class="modal-btn-container">
+            <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
+            <button type="button" id="modal-next" class="modal-next btn">Next</button>
+        </div>
     </div>
     `;
+  const nextButton = document.getElementById('modal-next');
+  nextButton.addEventListener('click', () => {
+    modalDiv.parentElement.removeChild(modalDiv);
+    if(i < 11){
+      modalHTML(data, i += 1);
+    } else {
+      modalHTML(data, i = 0);
+    }
+  });
+  const prevButton = document.getElementById('modal-prev');
+  prevButton.addEventListener('click', () => {
+    modalDiv.parentElement.removeChild(modalDiv);
+    if(i > 0){
+      modalHTML(data, i -= 1);
+    } else {
+      modalHTML(data, i = 11);
+    }
+  });
+
   const closeBtn = document.getElementById('modal-close-btn');
-  //console.log(closeBtn);
   closeBtn.addEventListener('click', () => {
     modalDiv.parentElement.removeChild(modalDiv);
   });
@@ -124,7 +145,6 @@ function employeeSearch (data) {
 
   });
 }
-
 
 fetchData(randomPeopleUrl)
   .then(data => makeGalleryHTML(data.results))
