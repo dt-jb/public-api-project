@@ -1,16 +1,18 @@
 
+//Global variables
 const howManyPeople = 12;
 const latinCharNationalities =  'au,br,ca,ch,de,dk,es,fi,fr,gb,ie,no,nl,nz,us';
 const randomPeopleUrl = `https://randomuser.me/api/?nat=${latinCharNationalities}&results=${howManyPeople}`;
 const galleryDiv = document.getElementById('gallery');
 let employeeGallery = [];
 
-
+//Reusable fetch function
 function fetchData(url){
   return fetch(url)
           .then(res => res.json());
 }
 
+//Creates the gallery dynamically with data fetched from random peope api
 function makeGalleryHTML(data){
   data.map(employee => {
     const div = document.createElement('div');
@@ -32,6 +34,7 @@ function makeGalleryHTML(data){
   return data;
 }
 
+//Creates an event listener for each card- which will be used to create a modal upon click
 function modalEvents(data) {
   const cards = document.querySelectorAll('#card');
   cards.forEach( (card, i) => {
@@ -41,6 +44,8 @@ function modalEvents(data) {
   });
 }
 
+/*Once card is clicked this function runs to create modal window html.  this function also runs to
+generate a new modal if the next or prev buttons are clicked*/
 function modalHTML(data, i) {
   const modalDiv = document.createElement('div');
   galleryDiv.appendChild(modalDiv);
@@ -49,6 +54,7 @@ function modalHTML(data, i) {
         <div class="modal">
             <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
             <div class="modal-info-container" id="div-modal">
+                <h2>Say hello to <span  class="modal-name cap">${employeeGallery[i].name.first}!</span></h2>
                 <img class="modal-img" src=${employeeGallery[i].picture.medium} alt="profile picture">
                 <h3 id="name" class="modal-name cap">${employeeGallery[i].name.first} ${employeeGallery[i].name.last}</h3>
                 <p class="modal-text">${employeeGallery[i].email}</p>
@@ -65,6 +71,7 @@ function modalHTML(data, i) {
         </div>
     </div>
     `;
+
   const nextButton = document.getElementById('modal-next');
   nextButton.addEventListener('click', () => {
     modalDiv.parentElement.removeChild(modalDiv);
@@ -74,6 +81,7 @@ function modalHTML(data, i) {
       modalHTML(data, i = 0);
     }
   });
+
   const prevButton = document.getElementById('modal-prev');
   prevButton.addEventListener('click', () => {
     modalDiv.parentElement.removeChild(modalDiv);
@@ -90,6 +98,7 @@ function modalHTML(data, i) {
   });
 }
 
+//adds employee search functionality
 function employeeSearch (data) {
   const searchContainerDiv = document.getElementsByClassName('search-container');
   const searchDiv = document.createElement('form');
@@ -104,9 +113,11 @@ function employeeSearch (data) {
   const searchInput = document.getElementById('search-input');
   const searchForm = searchInput.parentNode;
   searchForm.addEventListener('submit', (event) => {
+  //searchForm.addEventListener('keyup', (event) => {
     event.preventDefault();
     const searchArr = employeeGallery.filter(employee => {
       return searchInput.value.toLowerCase() === employee.name.last || searchInput.value.toLowerCase() === employee.name.first;
+      //return employee.name.last.includes(searchInput.value.toLowerCase()) || employee.name.last.includes(searchInput.value.toLowerCase());
     });
     //hides gallery div (#card) and shows search results html.
     const searchResultsDiv = document.createElement('div');
@@ -114,6 +125,7 @@ function employeeSearch (data) {
     galleryDiv.style.display = "none";
     //galleryDiv.style.visibility = "hidden";
     body.appendChild(searchResultsDiv);
+    searchResultsDiv.classList.add("gallery");
     searchResultsDiv.innerHTML = `
       <div class="card" id="card">
           <div class="card-img-container">
@@ -131,7 +143,7 @@ function employeeSearch (data) {
     const backBtn = document.createElement('button');
     body.appendChild(backBtn);
     backBtn.innerHTML = `
-      <input type="submit" value="back" id="serach-submit" class="search-submit">
+      <input type="submit" value="back" id="back-button"/*class="search-submit"*/>
     `;
     backBtn.addEventListener('click', () => {
       galleryDiv.style.display = "block";
@@ -146,6 +158,7 @@ function employeeSearch (data) {
   });
 }
 
+//requests the data from the random people API and passes the data to the corresponding functions
 fetchData(randomPeopleUrl)
   .then(data => makeGalleryHTML(data.results))
   .then(data => employeeSearch(data))
