@@ -17,17 +17,17 @@ function makeGalleryHTML(data){
   data.map(employee => {
     const div = document.createElement('div');
     galleryDiv.appendChild(div);
+    div.setAttribute("class", "card");
+    div.setAttribute("id", "card");
     div.innerHTML = `
-      <div class="card" id="card">
-          <div class="card-img-container">
-              <img class="card-img" src=${employee.picture.medium} alt="profile picture">
-          </div>
-          <div class="card-info-container">
-              <h3 id="name" class="card-name cap">${employee.name.first} ${employee.name.last}</h3>
-              <p class="card-text">${employee.email}</p>
-              <p class="card-text cap">${employee.location.city}, ${employee.location.state}</p>
-          </div>
+      <div class="card-img-container">
+        <img class="card-img" src=${employee.picture.large} alt="profile picture">
       </div>
+      <div class="card-info-container">
+        <h3 id="name" class="card-name cap">${employee.name.first} ${employee.name.last}</h3>
+        <p class="card-text">${employee.email}</p>
+        <p class="card-text cap">${employee.location.city}, ${employee.location.state}</p>
+        </div>
     `;
     employeeGallery.push(employee);
   });
@@ -55,14 +55,14 @@ function modalHTML(data, i) {
             <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
             <div class="modal-info-container" id="div-modal">
                 <h2>Say hello to <span  class="modal-name cap">${employeeGallery[i].name.first}!</span></h2>
-                <img class="modal-img" src=${employeeGallery[i].picture.medium} alt="profile picture">
+                <img class="modal-img" src=${employeeGallery[i].picture.large} alt="profile picture">
                 <h3 id="name" class="modal-name cap">${employeeGallery[i].name.first} ${employeeGallery[i].name.last}</h3>
                 <p class="modal-text">${employeeGallery[i].email}</p>
                 <p class="modal-text cap">${employeeGallery[i].location.city}</p>
                 <hr>
                 <p class="modal-text">${employeeGallery[i].phone}</p>
                 <p class="modal-text">${employeeGallery[i].location.street}, ${employeeGallery[i].location.city}, ${employeeGallery[i].location.state} ${employeeGallery[i].location.postcode}</p>
-                <p class="modal-text">${employeeGallery[i].dob.date}</p>
+                <p class="modal-text">Birthday: ${employeeGallery[i].dob.date.substring(5,7)}/${employeeGallery[i].dob.date.substring(8,10)}/${employeeGallery[i].dob.date.substring(0,4)}</p>
             </div>
         </div>
         <div class="modal-btn-container">
@@ -117,8 +117,11 @@ function employeeSearch (data) {
     event.preventDefault();
     const searchArr = employeeGallery.filter(employee => {
       return searchInput.value.toLowerCase() === employee.name.last || searchInput.value.toLowerCase() === employee.name.first;
+    //});
       //return employee.name.last.includes(searchInput.value.toLowerCase()) || employee.name.last.includes(searchInput.value.toLowerCase());
     });
+    //.filter( (employee, position) => employeeGallery.indexOf(employee) == position);
+
     //hides gallery div (#card) and shows search results html.
     const searchResultsDiv = document.createElement('div');
     const body = document.querySelector('body');
@@ -126,18 +129,24 @@ function employeeSearch (data) {
     //galleryDiv.style.visibility = "hidden";
     body.appendChild(searchResultsDiv);
     searchResultsDiv.classList.add("gallery");
-    searchResultsDiv.innerHTML = `
-      <div class="card" id="card">
-          <div class="card-img-container">
-              <img class="card-img" src=${searchArr[0].picture.medium} alt="profile picture">
-          </div>
-          <div class="card-info-container">
-              <h3 id="name" class="card-name cap">${searchArr[0].name.first} ${searchArr[0].name.last}</h3>
-              <p class="card-text">${searchArr[0].email}</p>
-              <p class="card-text cap">${searchArr[0].location.city}, ${searchArr[0].location.state}</p>
-          </div>
-      </div>
-    `;
+
+    searchArr.forEach(item => {
+      searchResultsDiv.innerHTML = `
+        <div class="card" id="card">
+            <div class="card-img-container">
+                <img class="card-img" src=${item.picture.large} alt="profile picture">
+            </div>
+            <div class="card-info-container">
+                <h3 id="name" class="card-name cap">${item.name.first} ${item.name.last}</h3>
+                <p class="card-text">${item.email}</p>
+                <p class="card-text cap">${item.location.city}, ${item.location.state}</p>
+            </div>
+        </div>
+      `;
+    });
+    if(searchArr.length === 0){
+      searchResultsDiv.innerHTML = `<h3>Sorry, no results were found.<h3>`;
+    }
     searchDiv.style.display = "none";
     searchDiv.style = "";
     const backBtn = document.createElement('button');
@@ -154,7 +163,6 @@ function employeeSearch (data) {
       backBtn.parentNode.removeChild(backBtn);
       searchInput.value = "";
     });
-
   });
 }
 
